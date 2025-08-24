@@ -1,0 +1,16 @@
+{
+  "name": "rampforge-ai",
+  "version": "1.0.0",
+  "description": "AI-powered developer onboarding platform",
+  "scripts": {
+    "dev": "docker-compose up --build",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python app/main.py",
+    "test:connectivity": "node test-connectivity.js",
+    "verify:setup": "node verify-setup.js",
+    "install:all": "cd frontend && npm install && cd ../backend && pip install -r requirements.txt"
+  },
+  "keywords": ["ai", "onboarding", "developer", "platform"],
+  "author": "RampForgeAI Team",
+  "license": "MIT"
+}
