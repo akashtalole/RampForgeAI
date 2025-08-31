@@ -1,0 +1,31 @@
+{
+  "enabled": true,
+  "name": "Source Code Documentation Sync",
+  "description": "Monitors all source files in the repository (TypeScript, Python, and configuration files) and triggers documentation updates in the /docs folder when changes are detected",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "frontend/src/**/*.ts",
+      "frontend/src/**/*.tsx",
+      "frontend/*.ts",
+      "frontend/*.tsx",
+      "frontend/*.js",
+      "frontend/*.jsx",
+      "frontend/package.json",
+      "frontend/next.config.ts",
+      "frontend/tailwind.config.ts",
+      "frontend/tsconfig.json",
+      "backend/app/**/*.py",
+      "backend/*.py",
+      "backend/requirements.txt",
+      "docker-compose.yml",
+      "package.json",
+      "README.md"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source code files have been modified in this RampForgeAI project. Please analyze the changes and update the documentation in the /docs folder accordingly. The project has both frontend (Next.js/TypeScript) and backend (FastAPI/Python) components, so update the appropriate documentation sections in /docs/frontend and /docs/backend based on what was changed. Focus on keeping the documentation current with the actual implementation, including API changes, component updates, configuration modifications, and architectural changes."
+  }
+}

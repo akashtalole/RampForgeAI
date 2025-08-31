@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px 20px; margin: 5px; }
+        .result { margin: 20px 0; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; }
+        .error { border-color: #f00; background: #fee; }
+        .success { border-color: #0a0; background: #efe; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Frontend Authentication Test</h1>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="test@example.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" value="testpassword123">
+        </div>
+        
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testVerify()">Test Verify Token</button>
+        <button onclick="testGetUser()">Test Get User</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+        
+        <div id="result" class="result"></div>
+        
+        <h3>Current State:</h3>
+        <div id="state" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        function updateState() {
+            const token = localStorage.getItem('rampforge_token');
+            const user = localStorage.getItem('rampforge_user');
+            
+            document.getElementById('state').innerHTML = `
+                <strong>LocalStorage:</strong><br>
+                Token: ${token ? 'Present (' + token.substring(0, 20) + '...)' : 'None'}<br>
+                User: ${user ? 'Present' : 'None'}<br>
+                ${user ? '<pre>' + JSON.stringify(JSON.parse(user), null, 2) + '</pre>' : ''}
+            `;
+        }
+        
+        function showResult(message, isError = false) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.className = 'result ' + (isError ? 'error' : 'success');
+            updateState();
+        }
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Login failed');
+                }
+                
+                const authResponse = await response.json();
+                
+                // Store token and user
+                localStorage.setItem('rampforge_token', authResponse.access_token);
+                localStorage.setItem('rampforge_user', JSON.stringify(authResponse.user));
+                
+                showResult(`✅ Login successful!<br>Token: ${authResponse.access_token.substring(0, 30)}...<br>User: ${authResponse.user.name}`);
+                
+            } catch (error) {
+                showResult(`❌ Login failed: ${error.message}`, true);
+            }
+        }
+        
+        async function testVerify() {
+            const token = localStorage.getItem('rampforge_token');
+            if (!token) {
+                showResult('❌ No token found', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/auth/verify`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Verification failed');
+                }
+                
+                const result = await response.json();
+                showResult(`✅ Token verified: ${result.message}`);
+                
+            } catch (error) {
+                showResult(`❌ Verification failed: ${error.message}`, true);
+            }
+        }
+        
+        async function testGetUser() {
+            const token = localStorage.getItem('rampforge_token');
+            if (!token) {
+                showResult('❌ No token found', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Get user failed');
+                }
+                
+                const user = await response.json();
+                localStorage.setItem('rampforge_user', JSON.stringify(user));
+                showResult(`✅ User retrieved: ${user.name} (${user.email})`);
+                
+            } catch (error) {
+                showResult(`❌ Get user failed: ${error.message}`, true);
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.removeItem('rampforge_token');
+            localStorage.removeItem('rampforge_user');
+            showResult('🗑️ Storage cleared');
+        }
+        
+        // Initialize
+        updateState();
+    </script>
+</body>
+</html>
