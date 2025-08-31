@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
@@ -17,12 +19,13 @@ import {
   Search
 } from 'lucide-react';
 
-export default function ProjectManagementPage() {
+function ProjectManagementContent() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <MainLayout>
+      <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -220,6 +223,15 @@ export default function ProjectManagementPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </MainLayout>
+  );
+}
+
+export default function ProjectManagementPage() {
+  return (
+    <ProtectedRoute>
+      <ProjectManagementContent />
+    </ProtectedRoute>
   );
 }
