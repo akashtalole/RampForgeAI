@@ -17,12 +17,12 @@
       ]
     },
     "github": {
-      "command": "C:\\Users\\Ei12794\\Downloads\\github-mcp-server-main\\github-mcp-server-main\\cmd\\github-mcp-server\\github-mcp-server",
+      "command": "C:\\github-mcp-server-main\\cmd\\github-mcp-server\\github-mcp-server",
       "args": [
         "stdio"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
       },
       "disabled": false,
       "autoApprove": [
